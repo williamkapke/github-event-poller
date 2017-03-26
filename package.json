@@ -1,0 +1,30 @@
+{
+  "name": "github-event-poller",
+  "version": "1.0.0",
+  "description": "Poll GitHub Events API",
+  "main": "poll.js",
+  "dependencies": {
+    "get-then": "^1.1.1"
+  },
+  "devDependencies": {
+    "dotenv": "^4.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/williamkapke/github-event-poller.git"
+  },
+  "keywords": [
+    "Poll",
+    "GitHub",
+    "Events"
+  ],
+  "author": "William Kapke",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/williamkapke/github-event-poller/issues"
+  },
+  "homepage": "https://github.com/williamkapke/github-event-poller#readme"
+}
