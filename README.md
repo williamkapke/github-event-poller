@@ -1,6 +1,8 @@
 # github-event-poller
 This module polls GitHub Events APIs while obeying GitHub's polling rules.
 
+[![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+
 ## Install It...
 ```
 $ npm install --save github-event-poller

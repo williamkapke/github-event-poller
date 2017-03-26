@@ -7,7 +7,7 @@ const headers = {
   'If-Modified-Since': ''
 }
 
-module.exports = function(url, callback, customInterval) {
+module.exports = function (url, callback, customInterval) {
   if (!url || !/^https:\/\/([^@]+@)?api\.github\.com\//i.test(url)) throw new Error('You must specify a GitHub API url to poll')
 
   customInterval = typeof customInterval === 'function'
@@ -54,7 +54,7 @@ module.onerror = function logError (e) {
   console.error('Error getting events from GitHub')
   if (e) {
     console.error(e.headers)
-    console.error(Buffer.isBuffer(e)? String(e) : e)
+    console.error(Buffer.isBuffer(e) ? String(e) : e)
   }
   // retry in 2 minutes
   return 120
