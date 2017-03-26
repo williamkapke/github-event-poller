@@ -6,6 +6,7 @@ const headers = {
   // gets added/updated below
   'If-Modified-Since': ''
 }
+const getReset = (res) => new Date(parseInt(res.headers['x-ratelimit-reset'] + '000'))
 
 module.exports = function (url, callback, customInterval) {
   if (!url || !/^https:\/\/([^@]+@)?api\.github\.com\//i.test(url)) throw new Error('You must specify a GitHub API url to poll')
@@ -26,7 +27,7 @@ module.exports = function (url, callback, customInterval) {
       }
       // Get GitHub's desired polling interval
       const interval = +(res.headers['x-poll-interval'] || '60')
-      const reset = new Date(parseInt(res.headers['x-ratelimit-reset'] + '000'))
+      const reset = getReset(res)
       const minutes = ((reset - Date.now()) / 60000).toFixed(2)
       callback({
         data: JSON.parse(String(res) || '[]'), // 304s will be an empty buffer
@@ -37,7 +38,7 @@ module.exports = function (url, callback, customInterval) {
       })
       return customInterval(interval) || 60
     })
-    .catch(module.onerror)
+    .catch(module.exports.onerror)
     .then((seconds) => {
       if (seconds > 0) {
         setTimeout(poll, seconds * 1000)
@@ -49,12 +50,20 @@ module.exports = function (url, callback, customInterval) {
   poll()
 }
 
-// allow override
-module.onerror = function logError (e) {
-  console.error('Error getting events from GitHub')
+// allow overrides
+module.exports.logerror = console.error
+module.exports.onerror = function logError (e) {
+  if (e && e.statusCode === 403 && String(e).includes('rate limit exceeded')) {
+    const seconds = ((getReset(e) - new Date()) / 1000) + 1
+    module.exports.logerror(`Rate limit exceeded. Resuming in ${(seconds / 60).toFixed(2)} minutes.`)
+    // set the next poll to run when the limit is reset (plus 1 second for good measure)
+    return seconds
+  }
+
+  module.exports.logerror('Error getting events from GitHub')
   if (e) {
-    console.error(e.headers)
-    console.error(Buffer.isBuffer(e) ? String(e) : e)
+    module.exports.logerror(e.headers)
+    module.exports.logerror(Buffer.isBuffer(e) ? String(e) : e)
   }
   // retry in 2 minutes
   return 120
